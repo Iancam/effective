@@ -245,10 +245,20 @@ class TaskList extends Component {
     this.rightFilterInput.focus();
   };
 
-  handleChange = selectedOption => {
-    const matches = this.getMatchingTasks();
-    this.onChangeFilter({ target: { value: selectedOption.label } });
-    console.log(`Option selected:`, selectedOption);
+  handleChange = (selectedOption, { action, option, name }) => {
+    const actionTypes = [
+      'clear',
+      'create-option',
+      'deselect-option',
+      'pop-value',
+      'remove-value',
+      'select-option',
+      'set-value'
+    ];
+
+    console.log(action, selectedOption);
+    action === 'select-option' &&
+      this.onChangeFilter({ target: { value: option.label } });
   };
 
   render() {
@@ -276,13 +286,22 @@ class TaskList extends Component {
       <div className="task-list-ctn">
         <div className="pursuance-tasks-ctn">
           <Select
+            isSearchable
+            isMulti
             placeholder={'assigned to...'}
             styles={selectStyle}
             value={taskListFilter}
             onChange={this.handleChange}
-            options={matches.map(m => ({ label: m.assigned_to, value: m.gid }))}
+            options={matches
+              .filter(m => m.assigned_to)
+              .map(m => ({
+                label: '@' + m.assigned_to,
+                value: m.gid
+              }))}
           />
           <Select
+            isSearchable
+            isMulti
             placeholder={'Entitled...'}
             styles={selectStyle}
             value={taskListFilter}
