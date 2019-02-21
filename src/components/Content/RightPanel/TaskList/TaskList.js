@@ -234,6 +234,8 @@ class TaskList extends Component {
 
   onChangeFilter = e => {
     const { rpUpdateTaskListFilter } = this.props;
+    console.log(e.target.value);
+
     rpUpdateTaskListFilter(e.target.value);
   };
 
@@ -244,6 +246,8 @@ class TaskList extends Component {
   };
 
   handleChange = selectedOption => {
+    const matches = this.getMatchingTasks();
+    this.onChangeFilter({ target: { value: selectedOption.label } });
     console.log(`Option selected:`, selectedOption);
   };
 
@@ -254,28 +258,33 @@ class TaskList extends Component {
     } = this.props;
 
     const matches = this.getMatchingTasks();
-
-    console.log(taskListFilter, matches);
+    const recolor = base => ({
+      ...base,
+      background: '#1c1c1c',
+      color: 'white',
+      highlight: 'rgba(0, 0, 0, .5)',
+      width: '100%'
+    });
+    const selectStyle = {
+      singleValue: base => ({ ...base, color: 'white' }),
+      valueContainer: recolor,
+      menu: recolor
+    };
+    // console.log(taskListFilter, matches);
 
     return (
       <div className="task-list-ctn">
         <div className="pursuance-tasks-ctn">
           <Select
-            styles={{
-              singleValue: base => ({ ...base, color: 'white' }),
-              valueContainer: base => ({
-                ...base,
-                background: '#1c1c1c',
-                // color: 'black',
-                width: '100%'
-              }),
-              menu: base => ({
-                ...base,
-                background: '#1c1c1c',
-                // color: 'black',
-                width: '100%'
-              })
-            }}
+            placeholder={'assigned to...'}
+            styles={selectStyle}
+            value={taskListFilter}
+            onChange={this.handleChange}
+            options={matches.map(m => ({ label: m.assigned_to, value: m.gid }))}
+          />
+          <Select
+            placeholder={'Entitled...'}
+            styles={selectStyle}
             value={taskListFilter}
             onChange={this.handleChange}
             options={matches.map(m => ({ label: m.title, value: m.gid }))}
