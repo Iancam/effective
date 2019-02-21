@@ -246,19 +246,20 @@ class TaskList extends Component {
   };
 
   handleChange = (selectedOption, { action, option, name }) => {
-    const actionTypes = [
-      'clear',
-      'create-option',
-      'deselect-option',
-      'pop-value',
-      'remove-value',
-      'select-option',
-      'set-value'
-    ];
+    console.log(action);
 
-    console.log(action, selectedOption);
-    action === 'select-option' &&
-      this.onChangeFilter({ target: { value: option.label } });
+    const actionTypes = {
+      clear: this.clearFilter,
+      'create-option': () => undefined,
+      'deselect-option': () => undefined,
+      'pop-value': () => undefined,
+      'remove-value': () => undefined,
+      'select-option': () =>
+        this.onChangeFilter({ target: { value: option.label } }),
+      'set-value': () => undefined
+    };
+
+    actionTypes[action]();
   };
 
   render() {
@@ -280,7 +281,9 @@ class TaskList extends Component {
       valueContainer: recolor,
       menu: recolor
     };
-    // console.log(taskListFilter, matches);
+    console.log(taskListFilter);
+    const filterOption =
+      taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
 
     return (
       <div className="task-list-ctn">
@@ -290,7 +293,7 @@ class TaskList extends Component {
             isMulti
             placeholder={'assigned to...'}
             styles={selectStyle}
-            value={taskListFilter}
+            value={filterOption}
             onChange={this.handleChange}
             options={matches
               .filter(m => m.assigned_to)
@@ -304,7 +307,7 @@ class TaskList extends Component {
             isMulti
             placeholder={'Entitled...'}
             styles={selectStyle}
-            value={taskListFilter}
+            value={filterOption}
             onChange={this.handleChange}
             options={matches.map(m => ({ label: m.title, value: m.gid }))}
           />
