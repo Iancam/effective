@@ -87,14 +87,14 @@
   cursor: default;
   opacity: 0.2;
 }
- 
+
 .task-list-filter .clear-input:focus,
 .task-list-filter .clear-input:active {
   box-shadow: none;
   -webkit-box-shadow: none;
   background-color: transparent;
 }
- 
+
 .task-list-filter .clear-input:not(.clear-input--hide):hover {
   opacity: 1;
 }

@@ -243,6 +243,10 @@ class TaskList extends Component {
     this.rightFilterInput.focus();
   };
 
+  handleChange = selectedOption => {
+    console.log(`Option selected:`, selectedOption);
+  };
+
   render() {
     const {
       rightPanel: { taskListFilter },
@@ -250,10 +254,32 @@ class TaskList extends Component {
     } = this.props;
 
     const matches = this.getMatchingTasks();
+
     console.log(taskListFilter, matches);
+
     return (
       <div className="task-list-ctn">
         <div className="pursuance-tasks-ctn">
+          <Select
+            styles={{
+              singleValue: base => ({ ...base, color: 'white' }),
+              valueContainer: base => ({
+                ...base,
+                background: '#1c1c1c',
+                // color: 'black',
+                width: '100%'
+              }),
+              menu: base => ({
+                ...base,
+                background: '#1c1c1c',
+                // color: 'black',
+                width: '100%'
+              })
+            }}
+            value={taskListFilter}
+            onChange={this.handleChange}
+            options={matches.map(m => ({ label: m.title, value: m.gid }))}
+          />
           <h2 className="task-list-title">Task List</h2>
           <div className="task-list-filter">
             <div className="filter-label">Filter:</div>
@@ -267,13 +293,6 @@ class TaskList extends Component {
               autoFocus={!window.hasVirtualKeyboard}
               onChange={this.onChangeFilter}
             />
-
-            {/* (<Select
-              value={selectedOption}
-              onChange={this.handleChange}
-              options={options}
-            />) */}
-
             <Button
               className={
                 taskListFilter.length > 0
