@@ -8,6 +8,12 @@ import Select from 'react-select';
 import './TaskList.css';
 import task from './task';
 
+const PREFIX_TO_FIELD = {
+  'due:': 'due_date',
+  '@': 'assigned_to',
+  'status:': 'status'
+};
+
 class TaskList extends Component {
   getMatchingTasks = () => {
     const {
@@ -246,14 +252,16 @@ class TaskList extends Component {
   };
 
   handleChange = (selectedOption, { action, option, name }) => {
-    console.log(action);
+    console.log(selectedOption, action, option, name);
 
     const actionTypes = {
       clear: this.clearFilter,
       'create-option': () => undefined,
       'deselect-option': () => undefined,
       'pop-value': () => undefined,
-      'remove-value': () => undefined,
+      'remove-value': () => {
+        this.props;
+      },
       'select-option': () =>
         this.onChangeFilter({ target: { value: option.label } }),
       'set-value': () => undefined
@@ -262,13 +270,17 @@ class TaskList extends Component {
     actionTypes[action]();
   };
 
-  render() {
-    const {
-      rightPanel: { taskListFilter },
-      rpShowTaskDetails
-    } = this.props;
-
-    const matches = this.getMatchingTasks();
+  selector_factory = (
+    prefix,
+    options = {
+      mapper: (m, i, all) => m,
+      filterer: (m, i, all) => true,
+      reducer: (acc, m, i, all) => all
+    }
+  ) => {
+    const mapper = mapper || ((m, i, all) => m);
+    const filterer = filterer || ((m, i, all) => true);
+    const reducer = reducer || ((acc, m, i, all) => all);
     const recolor = base => ({
       ...base,
       background: '#1c1c1c',
@@ -281,36 +293,54 @@ class TaskList extends Component {
       valueContainer: recolor,
       menu: recolor
     };
-    console.log(taskListFilter);
+
+    //handle options
+    return ({ filterOption, matches }) => {
+      return (
+        <Select
+          isSearchable
+          isMulti
+          placeholder={prefix}
+          styles={selectStyle}
+          value={filterOption}
+          onChange={(selection, obj) => {
+            this.handleChange(prefix + selection, obj);
+          }}
+          options={matches
+            .map(mapper)
+            .filter(filterer)
+            .reduce(reducer)}
+        />
+      );
+    };
+  };
+
+  render() {
+    const {
+      rightPanel: { taskListFilter },
+      rpShowTaskDetails
+    } = this.props;
+
+    const matches = this.getMatchingTasks();
+
     const filterOption =
       taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
+    const Assignee = this.selector_factory('@', {
+      mapper: match => {
+        match;
+        return match;
+      }
+    });
+    const Status = this.selector_factory('status:', (acc, match) => {
+      return match;
+    });
 
+    const selectOptions = { filterOption, matches };
     return (
       <div className="task-list-ctn">
         <div className="pursuance-tasks-ctn">
-          <Select
-            isSearchable
-            isMulti
-            placeholder={'assigned to...'}
-            styles={selectStyle}
-            value={filterOption}
-            onChange={this.handleChange}
-            options={matches
-              .filter(m => m.assigned_to)
-              .map(m => ({
-                label: '@' + m.assigned_to,
-                value: m.gid
-              }))}
-          />
-          <Select
-            isSearchable
-            isMulti
-            placeholder={'Entitled...'}
-            styles={selectStyle}
-            value={filterOption}
-            onChange={this.handleChange}
-            options={matches.map(m => ({ label: m.title, value: m.gid }))}
-          />
+          <Assignee {...selectOptions} />
+          <Status {...selectOptions} />
           <h2 className="task-list-title">Task List</h2>
           <div className="task-list-filter">
             <div className="filter-label">Filter:</div>
