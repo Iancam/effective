@@ -9,6 +9,20 @@ import './TaskList.css';
 import task from './task';
 import { uniqBy } from 'lodash';
 
+const match_to_task = ({ gid, title }) => {
+  return (
+    <div key={gid} className="task-item">
+      <TaskDetailsTopbar taskGid={gid} />
+      <div
+        className="discuss-task-title-ctn"
+        onClick={() => rpShowTaskDetails({ taskGid: gid })}
+      >
+        <span className="discuss-task-title">{title}</span>
+      </div>
+    </div>
+  );
+};
+
 const PREFIX_TO_FIELD = {
   'due:': 'due_date',
   '@': 'assigned_to',
@@ -378,9 +392,7 @@ class TaskList extends Component {
               <FaTimes size={28} />
             </Button>
           </div>
-          <ul className="task-list">
-            {matches.map(t => task({ task: t, rpShowTaskDetails }))}
-          </ul>
+          <ul className="task-list">{matches.map(match_to_task)}</ul>
         </div>
       </div>
     );
