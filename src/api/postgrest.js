@@ -18,6 +18,37 @@ if (REACT_APP_BASIC_AUTH_USERNAME && REACT_APP_BASIC_AUTH_PASSWORD) {
     btoa(`${REACT_APP_BASIC_AUTH_USERNAME}:${REACT_APP_BASIC_AUTH_PASSWORD}`);
 }
 
+// const postgrestDataToReduxStore = getSuggestionName => data => {
+//   const reduxData = {};
+//   for (let i = 0; i < data.length; i++) {
+//     const datum = data[i];
+//     reduxData[datum.id] = datum;
+//     reduxData[datum.id].suggestionName = getSuggestionName(datum);
+//   }
+//   return reduxData;
+// };
+
+// export const apiFactory = (
+//   endpoint,
+//   query,
+//   displayName,
+//   method,
+//   payload = undefined,
+//   additionalHeaders = {}
+// ) => {
+//   const getSuggestionName = !isFunction(displayName)
+//     ? singleDataResult => singleDataResult[displayName]
+//     : displayName;
+//   const pathSuffix = endpoint + query;
+//   const promise = jsonReqFactory(method)(
+//     pathSuffix,
+//     payload,
+//     additionalHeaders
+//   );
+//   promise.then(postgrestDataToReduxStore(getSuggestionName));
+//   // TODO: lols. this is slightly harder than I want it to be
+// };
+
 export const jsonReqFactory = method => {
   return (pathSuffix, payload = undefined, additionalHeaders = {}) => {
     const headers = {
