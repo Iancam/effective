@@ -41,6 +41,8 @@ export const getPublicPursuancesReq = () => {
 export const postPursuanceReq = pursuance => {
   delete pursuance.isPending;
   delete pursuance.redirect;
+  console.log(pursuance);
+
   return postgrest
     .postJSON('/pursuances', pursuance, { Prefer: 'return=representation' })
     .then(pursuanceJSON => pursuanceJSON[0])

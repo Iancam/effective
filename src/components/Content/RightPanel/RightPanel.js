@@ -10,13 +10,25 @@ import FaAlignLeft from 'react-icons/lib/fa/align-left';
 import {
   toggleRightPanel,
   rpShowTaskDetails,
-  rpShowTaskList
+  rpShowTaskList,
+  getPursuances,
+  getUsers
 } from '../../../actions';
 import './RightPanel.css';
 
 class RightPanel extends Component {
+  componentWillMount() {
+    const { getPursuances, getUsers, pursuances, users } = this.props;
+    if (Object.keys(users).length === 0) {
+      console.log('the thing is getting done!');
 
-  getTooltip = (tooltip) => {
+      getUsers();
+    }
+    if (Object.keys(pursuances).length <= 1) {
+      getPursuances();
+    }
+  }
+  getTooltip = tooltip => {
     switch (tooltip) {
       case 'toggle-panel':
         return (
@@ -25,27 +37,23 @@ class RightPanel extends Component {
               {this.props.rightPanel.show ? 'Close Panel' : 'Open Panel'}
             </strong>
           </Tooltip>
-        )
+        );
       case 'task-details':
         return (
           <Tooltip id="tooltip-rp-task-details">
-            <strong>
-              Task Details
-            </strong>
+            <strong>Task Details</strong>
           </Tooltip>
-        )
+        );
       case 'task-list':
         return (
           <Tooltip id="tooltip-rp-task-list">
-            <strong>
-              Task List
-            </strong>
+            <strong>Task List</strong>
           </Tooltip>
-        )
+        );
       default:
         return null;
     }
-  }
+  };
 
   getArrowIcon = () => {
     if (this.props.rightPanel.show) {
@@ -53,7 +61,7 @@ class RightPanel extends Component {
     } else {
       return <FaAngleDoubleLeft size={28} />;
     }
-  }
+  };
 
   getDisplay = () => {
     if (this.props.rightPanel.show) {
@@ -61,7 +69,7 @@ class RightPanel extends Component {
     } else {
       return { display: 'none' };
     }
-  }
+  };
 
   getContent = () => {
     const { show, tab } = this.props.rightPanel;
@@ -76,12 +84,12 @@ class RightPanel extends Component {
       default:
         return null;
     }
-  }
+  };
 
-  getRpClassName = (menuItem) => {
+  getRpClassName = menuItem => {
     const { show, tab } = this.props.rightPanel;
-    return "rp-menu-icon " + (show && tab === menuItem ? 'Active' : '');
-  }
+    return 'rp-menu-icon ' + (show && tab === menuItem ? 'Active' : '');
+  };
 
   render() {
     const { toggleRightPanel, rpShowTaskDetails, rpShowTaskList } = this.props;
@@ -94,7 +102,8 @@ class RightPanel extends Component {
         <div id="right-panel">
           <OverlayTrigger
             placement="left"
-            overlay={this.getTooltip('toggle-panel')}>
+            overlay={this.getTooltip('toggle-panel')}
+          >
             <div className="toggle-panel-ctn" onClick={toggleRightPanel}>
               {this.getArrowIcon()}
             </div>
@@ -103,7 +112,8 @@ class RightPanel extends Component {
           <div className="rp-menu-ctn">
             <OverlayTrigger
               placement="left"
-              overlay={this.getTooltip('task-details')}>
+              overlay={this.getTooltip('task-details')}
+            >
               <div
                 id="rp-task-details"
                 className={this.getRpClassName('TaskDetails')}
@@ -115,7 +125,8 @@ class RightPanel extends Component {
 
             <OverlayTrigger
               placement="left"
-              overlay={this.getTooltip('task-list')}>
+              overlay={this.getTooltip('task-list')}
+            >
               <div
                 id="rp-task-list"
                 className={this.getRpClassName('TaskList')}
@@ -131,4 +142,13 @@ class RightPanel extends Component {
   }
 }
 
-export default connect(({rightPanel}) => ({rightPanel}), { toggleRightPanel, rpShowTaskDetails, rpShowTaskList })(RightPanel);
+export default connect(
+  ({ rightPanel, pursuances, users }) => ({ rightPanel, pursuances, users }),
+  {
+    toggleRightPanel,
+    rpShowTaskDetails,
+    rpShowTaskList,
+    getPursuances,
+    getUsers
+  }
+)(RightPanel);

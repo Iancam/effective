@@ -1,27 +1,27 @@
-import { getUsersReq } from '../api/users';
+import { getUsersReq, postUsersReq } from '../api/users';
 import {
   getPursuancesReq,
   getPublicPursuancesReq,
-  postPursuanceReq,
+  postPursuanceReq
 } from '../api/pursuances';
 import {
   postTaskReq,
   postTaskToTaskListReq,
   getTasksReq,
   patchTaskReq,
-  deleteTaskReq,
+  deleteTaskReq
 } from '../api/tasks';
 import {
   postTaskListReq,
   getTaskListsReq,
   patchTaskListReq,
-  deleteTaskListReq,
+  deleteTaskListReq
 } from '../api/task_lists';
 import {
   postMembershipReq,
   patchMembershipReq,
   getMembershipsReq,
-  deleteMembershipReq,
+  deleteMembershipReq
 } from '../api/memberships';
 
 export const updateFormField = (formId, fieldId, value) => ({
@@ -34,7 +34,7 @@ export const updateFormField = (formId, fieldId, value) => ({
 export const clearTaskFormFields = (formId, isInTaskList = false) => ({
   type: 'TASK_FORM_CLEAR_FIELDS',
   formId,
-  isInTaskList,
+  isInTaskList
 });
 
 export const setTaskFormParentGid = (formId, newParentGid, oldParentGid) => ({
@@ -45,6 +45,8 @@ export const setTaskFormParentGid = (formId, newParentGid, oldParentGid) => ({
 });
 
 export const getUsers = () => ({ type: 'GET_USERS', payload: getUsersReq() });
+
+export const postUser = () => ({ type: 'POST_USER', payload: postUsersReq() });
 
 export const getPursuancesByIds = pursuanceIds => ({
   type: 'GET_PURSUANCES_BY_IDS',
@@ -75,8 +77,8 @@ export const postTask = task => {
   return {
     type: 'POST_TASK',
     payload: postTaskReq(taskCopy)
-  }
-}
+  };
+};
 
 export const postTaskToTaskList = (task, taskList) => {
   const taskCopy = { ...task };
@@ -86,9 +88,9 @@ export const postTaskToTaskList = (task, taskList) => {
   }
   return {
     type: 'POST_TASK_TO_TASK_LIST',
-    payload: postTaskToTaskListReq(taskCopy, taskList),
-  }
-}
+    payload: postTaskToTaskListReq(taskCopy, taskList)
+  };
+};
 
 export const deleteTask = task => ({
   type: 'DELETE_TASK',
@@ -275,33 +277,33 @@ export const userLogoutSuccess = () => ({
 
 export const getInvites = ({ pursuanceId }) => ({
   type: 'GET_INVITES',
-  pursuanceId,
+  pursuanceId
 });
 
 export const postMembership = membership => ({
   type: 'POST_MEMBERSHIP',
-  payload: postMembershipReq(membership),
+  payload: postMembershipReq(membership)
 });
 
 export const getMemberships = filterOption => ({
   type: 'GET_MEMBERSHIPS',
-  payload: getMembershipsReq(filterOption),
+  payload: getMembershipsReq(filterOption)
 });
 
 export const deleteMembership = membership => ({
   type: 'DELETE_MEMBERSHIP',
-  payload: deleteMembershipReq(membership),
+  payload: deleteMembershipReq(membership)
 });
 
 export const setMembershipPermissionsLevel = membership => ({
   type: 'MEMBERSHIP_SET_PERMISSIONS_LEVEL',
-  payload: patchMembershipReq(membership),
+  payload: patchMembershipReq(membership)
 });
 
 // TaskLists
 export const getTaskLists = (pursuanceId, filterOptions) => ({
   type: 'GET_TASK_LISTS',
-  payload: getTaskListsReq(pursuanceId, filterOptions),
+  payload: getTaskListsReq(pursuanceId, filterOptions)
 });
 
 export const postTaskList = taskList => {
@@ -312,9 +314,9 @@ export const postTaskList = taskList => {
   }
   return {
     type: 'POST_TASK_LIST',
-    payload: postTaskListReq(taskListCopy),
-  }
-}
+    payload: postTaskListReq(taskListCopy)
+  };
+};
 
 export const deleteTaskList = taskList => ({
   type: 'DELETE_TASK_LIST',
@@ -323,54 +325,63 @@ export const deleteTaskList = taskList => ({
 
 export const addPostedRootTaskListToHierarchy = taskList => ({
   type: 'ADD_POSTED_ROOT_TASK_LIST',
-  taskList,
+  taskList
 });
 
 export const addPostedSubTaskListToHierarchy = taskList => ({
   type: 'ADD_POSTED_SUB_TASK_LIST',
-  taskList,
+  taskList
 });
 
-export const addTaskListFormUnderParent = (parentTaskListId, taskListFormId) => ({
+export const addTaskListFormUnderParent = (
+  parentTaskListId,
+  taskListFormId
+) => ({
   type: 'TASK_LIST_FORM_ADD_UNDER_PARENT',
   parentTaskListId,
-  taskListFormId,
+  taskListFormId
 });
 
-export const removeTaskListFormFromUnderParent = (parentTaskListId, taskListFormId) => ({
+export const removeTaskListFormFromUnderParent = (
+  parentTaskListId,
+  taskListFormId
+) => ({
   type: 'TASK_LIST_FORM_REMOVE_FROM_UNDER_PARENT',
   parentTaskListId,
-  taskListFormId,
+  taskListFormId
 });
 
 export const addTaskFormToEndOfTaskList = (parentTaskListId, taskFormId) => ({
   type: 'TASK_LIST_ADD_TASK_FORM_END',
   parentTaskListId,
-  taskFormId,
+  taskFormId
 });
 
-export const removeTaskFormFromEndOfTaskList = (parentTaskListId, taskListFormId) => ({
+export const removeTaskFormFromEndOfTaskList = (
+  parentTaskListId,
+  taskListFormId
+) => ({
   type: 'TASK_LIST_REMOVE_TASK_FORM_END',
   parentTaskListId,
-  taskListFormId,
+  taskListFormId
 });
 
 export const patchTaskList = taskList => ({
   type: 'PATCH_TASK_LIST',
-  payload: patchTaskListReq(taskList),
+  payload: patchTaskListReq(taskList)
 });
 
 export const archiveTaskList = taskList => ({
   type: 'TASK_LIST_ARCHIVE',
-  payload: patchTaskListReq({ ...taskList, is_archived: true }),
+  payload: patchTaskListReq({ ...taskList, is_archived: true })
 });
 
 export const setTaskListAssignee = taskList => ({
   type: 'TASK_LIST_SET_ASSIGNEE',
-  payload: patchTaskListReq(taskList),
+  payload: patchTaskListReq(taskList)
 });
 
 export const setTaskCelebrated = taskGid => ({
   type: 'PATCH_TASK_CELEBRATED',
-  taskGid,
+  taskGid
 });

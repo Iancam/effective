@@ -2,7 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { showTaskInPursuance } from '../../../../utils/tasks';
-import { getPursuances, getTasks, getUsers, rpShowTaskDetails, patchTask } from '../../../../actions';
+import {
+  getPursuances,
+  getTasks,
+  getUsers,
+  rpShowTaskDetails,
+  patchTask
+} from '../../../../actions';
 import FaCircleO from 'react-icons/lib/fa/circle-o';
 import TaskDetailsTopbar from './TaskDetailsTopbar';
 import TaskTitle from './TaskTitle/TaskTitle';
@@ -13,14 +19,8 @@ import Wysiwyg from './Wysiwyg/Wysiwyg';
 import './TaskDetails.css';
 
 class TaskDetails extends Component {
-
   componentWillMount() {
-    const {
-      currentPursuanceId,
-      tasks,
-      getTasks,
-      rightPanel
-    } = this.props;
+    const { currentPursuanceId, tasks, getTasks, rightPanel } = this.props;
 
     if (rightPanel.taskGid && !tasks.taskMap[rightPanel.taskGid]) {
       const thisTasksPursuanceId = rightPanel.taskGid.split(/_/)[0];
@@ -28,23 +28,22 @@ class TaskDetails extends Component {
 
       // If this task was assigned to this pursuance from another
       // pursuance, grab the current pursuance's tasks, too
-      if (currentPursuanceId &&
-          thisTasksPursuanceId !== currentPursuanceId.toString()) {
+      if (
+        currentPursuanceId &&
+        thisTasksPursuanceId !== currentPursuanceId.toString()
+      ) {
         getTasks(currentPursuanceId);
       }
-    }
-
-    const { getPursuances, getUsers, pursuances, users } = this.props;
-    if (Object.keys(users).length === 0) {
-      getUsers();
-    }
-    if (Object.keys(pursuances).length <= 1) {
-      getPursuances();
     }
   }
 
   render() {
-    const { pursuances, currentPursuanceId, tasks, rpShowTaskDetails } = this.props;
+    const {
+      pursuances,
+      currentPursuanceId,
+      tasks,
+      rpShowTaskDetails
+    } = this.props;
     const { taskGid } = this.props.rightPanel;
     const task = tasks.taskMap[taskGid];
     if (!task) {
@@ -57,16 +56,12 @@ class TaskDetails extends Component {
 
     const parent = tasks.taskMap[task.parent_task_gid];
     const parentTitle =
-      parent &&
-      showTaskInPursuance(parent, currentPursuanceId) &&
-      parent.title;
+      parent && showTaskInPursuance(parent, currentPursuanceId) && parent.title;
 
     return (
       <div className="discuss-ctn">
         <div className="task-details-ctn">
-          <TaskDetailsTopbar
-            taskGid={taskGid}
-          />
+          <TaskDetailsTopbar taskGid={taskGid} />
           <div className="pursuance-discuss-ctn">
             <div className="pursuance-task-title-ctn">
               <TaskTitle
@@ -75,32 +70,51 @@ class TaskDetails extends Component {
                 patchTask={this.props.patchTask}
               />
               {parentTitle && (
-                <div className="parent-task-ctn" onClick={() => rpShowTaskDetails({taskGid: task.parent_task_gid})}>
-                  <h4><strong>Parent Task:</strong></h4>
-                  {' '}
+                <div
+                  className="parent-task-ctn"
+                  onClick={() =>
+                    rpShowTaskDetails({ taskGid: task.parent_task_gid })
+                  }
+                >
+                  <h4>
+                    <strong>Parent Task:</strong>
+                  </h4>{' '}
                   <span>{parentTitle}</span>
                 </div>
               )}
             </div>
-            <TaskIcons
-              gid={task.gid}
-              subtaskGids={task.subtask_gids}
-            />
+            <TaskIcons gid={task.gid} subtaskGids={task.subtask_gids} />
             <div className="pursuance-title-ctn">
               <span className="pursuance-title">
-                Created in {pursuances[task.pursuance_id] && <em>{pursuances[task.pursuance_id].name}</em>}
+                Created in{' '}
+                {pursuances[task.pursuance_id] && (
+                  <em>{pursuances[task.pursuance_id].name}</em>
+                )}
               </span>
             </div>
             <div className="task-deliverables-ctn">
-              <Wysiwyg taskGid={taskGid} attributeName='deliverables' patchTask={this.props.patchTask} />
+              <Wysiwyg
+                taskGid={taskGid}
+                attributeName="deliverables"
+                patchTask={this.props.patchTask}
+              />
             </div>
             <div className="subtasks-ctn">
-              <h4><strong>Subtasks</strong></h4>
+              <h4>
+                <strong>Subtasks</strong>
+              </h4>
               <ul className="subtasks-list">
-                {subtaskGids.map((gid)=> {
-                  return <li key={gid} className="subtask-item" onClick={() => rpShowTaskDetails({taskGid: gid})}>
-                    <FaCircleO size={8} className="fa-circle-o" />{tasks.taskMap[gid].title}
-                  </li>
+                {subtaskGids.map(gid => {
+                  return (
+                    <li
+                      key={gid}
+                      className="subtask-item"
+                      onClick={() => rpShowTaskDetails({ taskGid: gid })}
+                    >
+                      <FaCircleO size={8} className="fa-circle-o" />
+                      {tasks.taskMap[gid].title}
+                    </li>
+                  );
                 })}
               </ul>
             </div>
@@ -117,8 +131,18 @@ class TaskDetails extends Component {
         </div>
       </div>
     );
-  };
+  }
 }
 
-export default withRouter(connect(({currentPursuanceId, pursuances, tasks, rightPanel, users}) => ({currentPursuanceId, pursuances, tasks, rightPanel, users}),
-  { getPursuances, getTasks, getUsers, rpShowTaskDetails, patchTask })(TaskDetails));
+export default withRouter(
+  connect(
+    ({ currentPursuanceId, pursuances, tasks, rightPanel, users }) => ({
+      currentPursuanceId,
+      pursuances,
+      tasks,
+      rightPanel,
+      users
+    }),
+    { getPursuances, getTasks, getUsers, rpShowTaskDetails, patchTask }
+  )(TaskDetails)
+);
