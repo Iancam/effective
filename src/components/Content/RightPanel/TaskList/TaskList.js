@@ -6,22 +6,7 @@ import TaskDetailsTopbar from '../TaskDetails/TaskDetailsTopbar';
 import FaTimes from 'react-icons/lib/fa/times-circle';
 import Select from 'react-select';
 import './TaskList.css';
-import task from './task';
 import { uniqBy } from 'lodash';
-
-const match_to_task = ({ gid, title }) => {
-  return (
-    <div key={gid} className="task-item">
-      <TaskDetailsTopbar taskGid={gid} />
-      <div
-        className="discuss-task-title-ctn"
-        onClick={() => rpShowTaskDetails({ taskGid: gid })}
-      >
-        <span className="discuss-task-title">{title}</span>
-      </div>
-    </div>
-  );
-};
 
 const PREFIX_TO_FIELD = {
   'due:': 'due_date',
@@ -341,18 +326,36 @@ class TaskList extends Component {
   render() {
     const {
       rightPanel: { taskListFilter },
-      rpShowTaskDetails
+      rpShowTaskDetails,
+      publicPursuances,
+      pursuances
     } = this.props;
 
     const matches = this.getMatchingTasks();
     const filterOption =
       taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
 
-    const Assignee = this.selector_factory('@', matches =>
-      matches
-        .map(match => ({ label: match.assigned_to, value: match }))
-        .filter(({ label }) => label)
-    );
+    const Assignee = this.selector_factory('@', matches => {
+      return uniqBy(matches, m => m.assigned_to_pursuance_id)
+        .filter(match => {
+          return (
+            match.assigned_to_pursuance_id !== null &&
+            match.assigned_to_pursuance_id !== undefined
+            // || match.assigned_to)
+          );
+        })
+        .map(match => {
+          const { assigned_to_pursuance_id: pid } = match;
+          let pursuance = publicPursuances[pid];
+          // const assigned_to = users
+          if (!pursuance) {
+            console.warn('using non-public pursuance list');
+            pursuance = pursuances[pid];
+          }
+          return { label: pursuance && pursuance.name, value: match };
+        })
+        .filter(({ label }) => label);
+    });
 
     const Status = this.selector_factory('status:', matches => {
       const thing = uniqBy(matches, match => match.status).map(match => ({
@@ -361,7 +364,19 @@ class TaskList extends Component {
       }));
       return thing;
     });
-
+    const match_to_task = ({ gid, title }) => {
+      return (
+        <div key={gid} className="task-item">
+          <TaskDetailsTopbar taskGid={gid} />
+          <div
+            className="discuss-task-title-ctn"
+            onClick={() => rpShowTaskDetails({ taskGid: gid })}
+          >
+            <span className="discuss-task-title">{title}</span>
+          </div>
+        </div>
+      );
+    };
     const selectOptions = { filterOption, matches };
     return (
       <div className="task-list-ctn">
@@ -400,11 +415,20 @@ class TaskList extends Component {
 }
 
 export default connect(
-  ({ currentPursuanceId, rightPanel, tasks, user }) => ({
+  ({
     currentPursuanceId,
     rightPanel,
     tasks,
-    user
+    user,
+    publicPursuances,
+    pursuances
+  }) => ({
+    currentPursuanceId,
+    rightPanel,
+    tasks,
+    user,
+    publicPursuances,
+    pursuances
   }),
   { rpUpdateTaskListFilter, rpShowTaskDetails }
 )(TaskList);
