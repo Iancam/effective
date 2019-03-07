@@ -9,6 +9,10 @@ const initialState = {
     '@me status:!done due:>' + _2monthsAgo.toISOString().slice(0, 10)
 };
 
+const path = 'right_panel_multiselect';
+const verbs = ['remove', 'add'];
+const selects = ['assignee', 'title', 'status'];
+
 export default function(state = initialState, action) {
   switch (action.type) {
     case 'RIGHT_PANEL_SHOW_TASK_DETAILS': {

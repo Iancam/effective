@@ -7,6 +7,7 @@ import FaTimes from 'react-icons/lib/fa/times-circle';
 import Select from 'react-select';
 import './TaskList.css';
 import task from './task';
+import { uniqBy } from 'lodash';
 
 const PREFIX_TO_FIELD = {
   'due:': 'due_date',
@@ -251,9 +252,7 @@ class TaskList extends Component {
     this.rightFilterInput.focus();
   };
 
-  handleChange = (selectedOption, { action, option, name }) => {
-    console.log(selectedOption, action, option, name);
-
+  handleChange = (prefix, selectedOption, { action, option, name }) => {
     const actionTypes = {
       clear: this.clearFilter,
       'create-option': () => undefined,
@@ -263,24 +262,15 @@ class TaskList extends Component {
         this.props;
       },
       'select-option': () =>
-        this.onChangeFilter({ target: { value: option.label } }),
+        this.onChangeFilter({ target: { value: prefix + option.label } }),
       'set-value': () => undefined
     };
 
     actionTypes[action]();
   };
 
-  selector_factory = (
-    prefix,
-    options = {
-      mapper: (m, i, all) => m,
-      filterer: (m, i, all) => true,
-      reducer: (acc, m, i, all) => all
-    }
-  ) => {
-    const mapper = mapper || ((m, i, all) => m);
-    const filterer = filterer || ((m, i, all) => true);
-    const reducer = reducer || ((acc, m, i, all) => all);
+  selector_factory = (prefix, transformer = x => x) => {
+    const initial_val = initial_val || [];
     const recolor = base => ({
       ...base,
       background: '#1c1c1c',
@@ -293,7 +283,6 @@ class TaskList extends Component {
       valueContainer: recolor,
       menu: recolor
     };
-
     //handle options
     return ({ filterOption, matches }) => {
       return (
@@ -304,16 +293,36 @@ class TaskList extends Component {
           styles={selectStyle}
           value={filterOption}
           onChange={(selection, obj) => {
-            this.handleChange(prefix + selection, obj);
+            console.log(prefix, '\n', selection, obj);
+
+            this.handleChange(prefix, selection, obj);
           }}
-          options={matches
-            .map(mapper)
-            .filter(filterer)
-            .reduce(reducer)}
+          options={transformer(matches)}
         />
       );
     };
   };
+
+  // (exampleMatchObject = {
+  //   gid: '3_5',
+  //   pursuance_id: 3,
+  //   id: 5,
+  //   title: 'loose',
+  //   title_enc: '',
+  //   deliverables: '',
+  //   deliverables_enc: '',
+  //   assigned_to: null,
+  //   assigned_to_pursuance_id: null,
+  //   due_date: null,
+  //   created: '2019-03 - 06T16: 35: 37.145858 - 08: 00',
+  //   parent_task_gid: null,
+  //   status: 'New',
+  //   is_archived: false,
+  //   subtask_gids: ['3_6', '3_7', '3_8', '3_9', '3_10', '3_11', '3_12'],
+  //   due_date_parsed: '1970 - 01 - 01T00: 00: 00.000Z'
+  // };)
+
+  // selectOptionType = ({ label: match.assigned_to, value: match }))
 
   render() {
     const {
@@ -322,17 +331,21 @@ class TaskList extends Component {
     } = this.props;
 
     const matches = this.getMatchingTasks();
-
     const filterOption =
       taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
-    const Assignee = this.selector_factory('@', {
-      mapper: match => {
-        match;
-        return match;
-      }
-    });
-    const Status = this.selector_factory('status:', (acc, match) => {
-      return match;
+
+    const Assignee = this.selector_factory('@', matches =>
+      matches
+        .map(match => ({ label: match.assigned_to, value: match }))
+        .filter(({ label }) => label)
+    );
+
+    const Status = this.selector_factory('status:', matches => {
+      const thing = uniqBy(matches, match => match.status).map(match => ({
+        label: match.status,
+        value: match
+      }));
+      return thing;
     });
 
     const selectOptions = { filterOption, matches };
@@ -343,7 +356,7 @@ class TaskList extends Component {
           <Status {...selectOptions} />
           <h2 className="task-list-title">Task List</h2>
           <div className="task-list-filter">
-            <div className="filter-label">Filter:</div>
+            <div className="filter-label">Filter</div>
             <input
               type="text"
               value={taskListFilter}
