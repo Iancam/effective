@@ -7,6 +7,7 @@ import FaTimes from 'react-icons/lib/fa/times-circle';
 import Select from 'react-select';
 import './TaskList.css';
 import { uniqBy } from 'lodash';
+import FilterSelector from './FilterSelector';
 
 const PREFIX_TO_FIELD = {
   'due:': 'due_date',
@@ -251,65 +252,6 @@ class TaskList extends Component {
     this.rightFilterInput.focus();
   };
 
-  handleChange = (prefix, selectedOption, { action, option, name }) => {
-    const actionTypes = {
-      clear: this.clearFilter,
-      'create-option': () => undefined,
-      'deselect-option': () => undefined,
-      'pop-value': () => undefined,
-      'remove-value': () => {
-        this.props;
-      },
-      'select-option': () =>
-        this.onChangeFilter({ target: { value: prefix + option.label } }),
-      'set-value': () => undefined
-    };
-
-    actionTypes[action]();
-  };
-
-  selector_factory = (prefix, transformer = x => x) => {
-    const initial_val = initial_val || [];
-    const recolor = base => ({
-      ...base,
-      background: '#1c1c1c',
-      color: 'white',
-      highlight: 'rgba(0, 0, 0, .5)',
-      width: '100%'
-    });
-    const selectStyle = {
-      singleValue: base => ({ ...base, color: 'white' }),
-      valueContainer: recolor,
-      menu: recolor
-    };
-    //handle options
-    return ({ filterOption, matches }) => {
-      const { label: filterString } = filterOption.length
-        ? filterOption[0]
-        : { label: '' };
-      const value = filterString
-        .split(' ')
-        .filter(tok => tok.startsWith(prefix))
-        .map(tok => ({ label: tok }));
-
-      return (
-        <Select
-          isSearchable
-          isMulti
-          placeholder={prefix}
-          styles={selectStyle}
-          value={value}
-          onChange={(selection, obj) => {
-            console.log(prefix, '\n', selection, obj);
-
-            this.handleChange(prefix, selection, obj);
-          }}
-          options={transformer(matches)}
-        />
-      );
-    };
-  };
-
   // (exampleMatchObject = {
   //   gid: '3_5',
   //   pursuance_id: 3,
@@ -334,34 +276,38 @@ class TaskList extends Component {
   render() {
     const {
       rightPanel: { taskListFilter },
-      rpShowTaskDetails,
-      publicPursuances,
-      pursuances
+      rpShowTaskDetails
     } = this.props;
 
     const matches = this.getMatchingTasks();
     const filterOption =
       taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
 
-    const Assignee = this.selector_factory('@', matches => {
-      return uniqBy(matches, m => m.assigned_to)
-        .filter(match => {
-          console.log(match.assigned_to);
-
-          return match.assigned_to;
-        })
-        .map(match => {
-          return { label: match.assigned_to, value: match };
-        })
-        .filter(({ label }) => label);
+    const Assignee = FilterSelector({
+      prefix: '@',
+      transformer: matches => {
+        return uniqBy(matches, m => m.assigned_to)
+          .filter(match => {
+            return match.assigned_to;
+          })
+          .map(match => {
+            return { label: match.assigned_to, value: match };
+          })
+          .filter(({ label }) => label);
+      },
+      onChangeFilter: this.onChangeFilter
     });
 
-    const Status = this.selector_factory('status:', matches => {
-      const thing = uniqBy(matches, match => match.status).map(match => ({
-        label: match.status,
-        value: match
-      }));
-      return thing;
+    const Status = FilterSelector({
+      prefix: 'status:',
+      transformer: matches => {
+        const thing = uniqBy(matches, match => match.status).map(match => ({
+          label: match.status,
+          value: match
+        }));
+        return thing;
+      },
+      onChangeFilter: this.onChangeFilter
     });
     const match_to_task = ({ gid, title }) => {
       return (
