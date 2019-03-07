@@ -291,7 +291,6 @@ class TaskList extends Component {
         .split(' ')
         .filter(tok => tok.startsWith(prefix))
         .map(tok => ({ label: tok }));
-      console.log(value);
 
       return (
         <Select
@@ -345,23 +344,14 @@ class TaskList extends Component {
       taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
 
     const Assignee = this.selector_factory('@', matches => {
-      return uniqBy(matches, m => m.assigned_to_pursuance_id)
+      return uniqBy(matches, m => m.assigned_to)
         .filter(match => {
-          return (
-            match.assigned_to_pursuance_id !== null &&
-            match.assigned_to_pursuance_id !== undefined
-            // || match.assigned_to)
-          );
+          console.log(match.assigned_to);
+
+          return match.assigned_to;
         })
         .map(match => {
-          const { assigned_to_pursuance_id: pid } = match;
-          let pursuance = publicPursuances[pid];
-          // const assigned_to = users
-          if (!pursuance) {
-            console.warn('using non-public pursuance list');
-            pursuance = pursuances[pid];
-          }
-          return { label: pursuance && pursuance.name, value: match };
+          return { label: match.assigned_to, value: match };
         })
         .filter(({ label }) => label);
     });

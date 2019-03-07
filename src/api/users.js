@@ -16,18 +16,14 @@ export const getUsersReq = () => {
 };
 
 export const postUsersReq = user => {
-  console.log(user);
-
   return postgrest
     .jsonReqFactory('POST')('/users', user, { Prefer: 'return=representation' })
     .then(resp => {
-      console.log(resp);
-
       const json = resp.json();
       if (!resp.ok) {
         // this could probably be moved to the factory method, honestly.
         // handle the error!
-        console.warn(json.message);
+        console.warn(json);
       }
       return json;
     })
