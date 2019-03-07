@@ -240,7 +240,7 @@ class TaskList extends Component {
 
   onChangeFilter = e => {
     const { rpUpdateTaskListFilter } = this.props;
-    console.log(e.target.value);
+    // console.log(e.target.value);
 
     rpUpdateTaskListFilter(e.target.value);
   };
@@ -284,13 +284,22 @@ class TaskList extends Component {
     };
     //handle options
     return ({ filterOption, matches }) => {
+      const { label: filterString } = filterOption.length
+        ? filterOption[0]
+        : { label: '' };
+      const value = filterString
+        .split(' ')
+        .filter(tok => tok.startsWith(prefix))
+        .map(tok => ({ label: tok }));
+      console.log(value);
+
       return (
         <Select
           isSearchable
           isMulti
           placeholder={prefix}
           styles={selectStyle}
-          value={filterOption}
+          value={value}
           onChange={(selection, obj) => {
             console.log(prefix, '\n', selection, obj);
 
