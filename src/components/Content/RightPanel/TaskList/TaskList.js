@@ -4,10 +4,10 @@ import { Button } from 'react-bootstrap';
 import { rpUpdateTaskListFilter, rpShowTaskDetails } from '../../../../actions';
 import TaskDetailsTopbar from '../TaskDetails/TaskDetailsTopbar';
 import FaTimes from 'react-icons/lib/fa/times-circle';
-import Select from 'react-select';
 import './TaskList.css';
 import { uniqBy } from 'lodash';
 import FilterSelector from './FilterSelector';
+import { VALID_STATUSES } from '../../../../constants';
 
 const PREFIX_TO_FIELD = {
   'due:': 'due_date',
@@ -276,37 +276,23 @@ class TaskList extends Component {
   render() {
     const {
       rightPanel: { taskListFilter },
-      rpShowTaskDetails
+      rpShowTaskDetails,
+      users
     } = this.props;
 
     const matches = this.getMatchingTasks();
     const filterOption =
       taskListFilter.length === 0 ? [] : [{ label: taskListFilter }];
-
+    const asLabel = x => ({ label: x });
     const Assignee = FilterSelector({
       prefix: '@',
-      transformer: matches => {
-        return uniqBy(matches, m => m.assigned_to)
-          .filter(match => {
-            return match.assigned_to;
-          })
-          .map(match => {
-            return { label: match.assigned_to, value: match };
-          })
-          .filter(({ label }) => label);
-      },
+      options: users.map(asLabel),
       onChangeFilter: this.onChangeFilter
     });
 
     const Status = FilterSelector({
       prefix: 'status:',
-      transformer: matches => {
-        const thing = uniqBy(matches, match => match.status).map(match => ({
-          label: match.status,
-          value: match
-        }));
-        return thing;
-      },
+      options: VALID_STATUSES.map(asLabel),
       onChangeFilter: this.onChangeFilter
     });
     const match_to_task = ({ gid, title }) => {
@@ -365,6 +351,7 @@ export default connect(
     rightPanel,
     tasks,
     user,
+    users,
     publicPursuances,
     pursuances
   }) => ({
@@ -372,6 +359,7 @@ export default connect(
     rightPanel,
     tasks,
     user,
+    users,
     publicPursuances,
     pursuances
   }),

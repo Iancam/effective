@@ -5,6 +5,16 @@ export const PROJECT = 'project';
 
 export const PROJECTS = PROJECT + 's';
 
+export const VALID_STATUSES = [
+  'New',
+  'Started',
+  'WorkingOn',
+  'HelpWanted',
+  'ReadyForReview',
+  'Reviewing',
+  'Done'
+];
+
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
